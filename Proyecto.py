@@ -1,15 +1,113 @@
+# Sistema de inventario por lotes
+# ahora con clases: el Inventario tiene los Lotes (composicion)
+
+class Lote:
+    stock_minimo = 5 # atributo de clase, es igual para todos
+
+    def __init__(self, nombre, marca, codigo, cantidad):
+        # privados, solo se cambian con los metodos
+        self.__nombre = nombre
+        self.__marca = marca
+        self.__codigo = codigo
+        self.__cantidad = cantidad
+
+    #getter (obtiene el valor de un atributo privado)
+    @property
+    def codigo(self): #sirve para leer el codigo desde afuera sin poder cambiarlo
+        return self.__codigo
+
+    #getter (obtiene el valor de un atributo privado)
+    @property
+    def cantidad(self): #sirve para leer la cantidad desde afuera sin poder cambiarla
+        return self.__cantidad
+
+    def descontar(self, cantidad):
+        if self.__cantidad == 0:
+            print("Ese lote esta agotado, no se puede descontar")
+            return False
+        if cantidad <= 0: #Ningun sistema debe permitir descontar 0
+            print("Debes descontar al menos 1")
+            return False
+        if cantidad > self.__cantidad:
+            print("No hay suficiente stock.")
+            return False
+        self.__cantidad = self.__cantidad - cantidad
+        print(f"Descuento exitoso {self.__nombre} Stock actualizado: {self.__cantidad}")
+        return True
+
+    def mostrar(self):
+        aviso = ""
+        if self.__cantidad == 0:
+            aviso = "(agotado)"
+        elif self.__cantidad < Lote.stock_minimo:
+            aviso = "(stock bajo)"
+        print(f"Producto: {self.__nombre}, Marca: {self.__marca}, Lote:{self.__codigo}, Cantidad: {self.__cantidad} {aviso}")
+
+class Inventario:
+    def __init__(self):
+        self.__lotes = [] # lista de lotes, privada
+
+    def agregar(self, nombre, marca, codigo, cantidad):
+        # el strip quita los espacios, asi "   " cuenta como vacio
+        if nombre.strip() == "" or codigo.strip() == "":
+            print("El nombre y el lote no pueden estar vacios")
+            return False
+        # reviso que el codigo del lote no este repetido
+        for lote in self.__lotes:
+            if lote.codigo == codigo:
+                print("Ese lote ya existe")
+                return False
+        nuevo = Lote(nombre, marca, codigo, cantidad)
+        self.__lotes.append(nuevo)
+        return True
+
+    def mostrar(self):
+        if len(self.__lotes) == 0:
+            print("El inventario esta vacio")
+        else:
+            # numero por pantalla desde 1, pero en python arranca en 0
+            for i in range(len(self.__lotes)):
+                print(i+1, end=") ")
+                self.__lotes[i].mostrar()
+
+    # me dice si ese numero esta en la lista
+    def existe(self, opcion):
+        fila = opcion - 1  # le quito el 1 que le sume arriba
+        # si no reviso el rango, el 0 me agarra la ultima fila
+        return fila >= 0 and fila < len(self.__lotes)
+
+    def descontar(self, opcion, cantidad):
+        if self.existe(opcion) == True:
+            return self.__lotes[opcion - 1].descontar(cantidad)
+        else:
+            print("Ese numero no esta en la lista.")
+            return False
+
+    # este retorna porque calcula
+    def total_unidades(self):
+        total = 0
+        for lote in self.__lotes:
+            total = total + lote.cantidad
+        return total
+
+# funcion para no repetir el while del isdigit en todos lados
+def leer_numero(mensaje):
+    numero = input(mensaje)
+    while numero.isdigit() == False:
+        print("Debes escribir un numero")
+        numero = input(mensaje)
+    return int(numero)
+
+
 print("Bienvenidos al Sistema De Inventario Por Lotes")
 print()
 
-# la matriz: cada fila es un lote
-# columnas -> 0 nombre | 1 marca | 2 lote | 3 cantidad
-inventario = [
-    ["Laptop",  "HP",       "L-101", 15],
-    ["Laptop",  "Lenovo",   "L-102", 8],
-    ["Teclado", "Logitech", "L-201", 40],
-    ["Mouse",   "Logitech", "L-202", 25],
-    ["Monitor", "Samsung",  "L-301", 12],
-]
+inventario = Inventario()
+inventario.agregar("Laptop", "HP", "L-101", 15)
+inventario.agregar("Laptop", "Lenovo", "L-102", 8)
+inventario.agregar("Teclado", "Logitech", "L-201", 40)
+inventario.agregar("Mouse", "Logitech", "L-202", 25)
+inventario.agregar("Monitor", "Samsung", "L-301", 12)
 
 
 while True:
@@ -21,65 +119,32 @@ while True:
     menu = input("Seleccione El Menu: ")
 
     match menu:
-        # recorrido: paso fila por fila y la muestro
         case "1":
             print("---------------------")
             print("Este es todo el inventario")
-            if len(inventario) == 0:
-                print("El inventario esta vacio")
-            else:
-                for producto in inventario:
-                    print(f"Producto: {producto[0]}, Marca: {producto[1]}, Lote:{producto[2]}, Cantidad: {producto[3]} ")
+            inventario.mostrar()
+            print("Total de unidades:", inventario.total_unidades())
 
-        # agrego una fila nueva al final de la matriz
         case "2":
             print("---------------------")
             print("Ingreso producto")
             nombre_producto = input("Ingrese el nombre del producto: ")
             marca_producto = input("Ingrese la marca del producto: ")
             lote_producto = input("Ingrese el numero de lote: ")
+            numero_producto = leer_numero("Ingrese la cantidad: ")
 
-            # lo leo como texto, reviso que sea numero, y ahi si lo convierto
-            numero_producto = input("Ingrese la cantidad: ")
-            while numero_producto.isdigit() == False:
-                print("Debes escribir un numero")
-                numero_producto = input("Ingrese la cantidad: ")
-            numero_producto = int(numero_producto)
-
-            # el orden tiene que ser igual al de las columnas
-            nuevo_producto = [nombre_producto, marca_producto, lote_producto, numero_producto]
-            inventario.append(nuevo_producto)
-            print("Producto agregado con exito")
+            if inventario.agregar(nombre_producto, marca_producto, lote_producto, numero_producto) == True:
+                print("Producto agregado con exito")
 
         case "3":
             print("---------------------")
             print("Eliga el producto a descontar")
-
-            # numero por pantalla desde 1, pero en python arranca en 0
-            for i in range(len(inventario)):
-                print(i+1, ")", "Producto: ",inventario[i][0], " Marca:", inventario[i][1], " Lote:", inventario[i][2], " Cantidad: ", inventario[i][3])
-
-            opcion = input("Elija el número: ")
-            while opcion.isdigit() == False:
-                opcion = input("Elija el número: ")
-            opcion = int(opcion)
-
-            fila = opcion - 1  # le quito el 1 que le sume arriba
-
-            # si no reviso el rango, el 0 me agarra la ultima fila
-            if fila >= 0 and fila < len(inventario):
-                descontar = input("Cuantos quieres descontar: ")
-                while descontar.isdigit() == False:
-                    descontar = input("Cuantos quieres descontar: ")
-                descontar = int(descontar)
-                if descontar == 0: #Ningun sistema debe permitir descontar 0
-                    print("Debes descontar al menos 1")
-                elif descontar > inventario[fila][3]:
-                    print("No hay suficiente stock.")
-                else:
-                    # esto si cambia la matriz de verdad
-                    inventario[fila][3] = inventario[fila][3] - descontar
-                    print(f"Descuento exitoso {inventario[fila][0]} Stock actualizado: {inventario[fila][3]}")
+            inventario.mostrar()
+            opcion = leer_numero("Elija el numero: ")
+            # primero reviso el numero y ahi si pregunto cuanto
+            if inventario.existe(opcion) == True:
+                descontar = leer_numero("Cuantos quieres descontar: ")
+                inventario.descontar(opcion, descontar)
             else:
                 print("Ese numero no esta en la lista.")
 
