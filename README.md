@@ -15,7 +15,7 @@ Monsalve Consuegra Jesús David - Usser: jsuz0712
 Rosales Altamar Jhana Jaziel - Usser: hannahrosalesjja25-ops
 Zambrano Marriaga Santiago Isaac - Usser: Sant1011
 
-Fecha:               
+Fecha: 15/10/2006             
 Lugar: Universidad de la Costa
 
 Atlantico, Barranquilla.
