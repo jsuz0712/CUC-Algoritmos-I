@@ -8,10 +8,10 @@ Ripoll Puche Michael Alexander
 # Proyecto:
 Sistemas de Inventario.
 
-El proyecto trata de un sistema de inventarios, en donde se utiliza estructuras de "Matríces" para el almacenamiento y dirigir la información de manera eficiente mediante el menú interactivo.
+Nuestro Sistema de Inventario por "Lotes" es un programa de consola en Python que guarda los productos en una "matriz", donde cada fila es un lote con nombre, marca, codigo y cantidad. Desde un menu se puede consultar todo el stock, registrar mercancia nueva o restar unidades de un lote elegido, y el codigo valida que las entradas sean numericas, que el lote exista y que no se retire mas de lo disponible.
 
 #  GRUPO I - Integrantes:
-Monsalve Consuegra Jesús David - Usser: jsuz0712 
+Monsalve Consuegra Jesus David - Usser: jsuz0712 
 Rosales Altamar Jhana Jaziel - Usser: hannahrosalesjja25-ops
 Zambrano Marriaga Santiago Isaac - Usser: Sant1011
 
